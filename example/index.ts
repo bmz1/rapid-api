@@ -1,9 +1,15 @@
+import Koa from 'koa'
+import bodyParser from 'koa-bodyparser'
+import Router from 'koa-router'
 import { Application } from '../src'
-import { HelloWorldController } from './controllers/HelloWorldController'
+import './controllers/HelloWorldController'
 
-const app = new Application()
-  .withControllers([HelloWorldController])
-  .withTasks([
+const koa = new Koa()
+const router = new Router()
+koa.use(bodyParser())
+
+const app = new Application(koa, router)
+  .beforeServerInit([
     async () => {
       console.log('Task 1')
       await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -12,7 +18,7 @@ const app = new Application()
       console.log('Task 2')
     }
   ])
-  .withShutdownTasks([
+  .onServerClose([
     async () => {
       console.log('Shutdown Task 1')
     },
